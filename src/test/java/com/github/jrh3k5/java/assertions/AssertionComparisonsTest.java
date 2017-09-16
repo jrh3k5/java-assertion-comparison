@@ -43,8 +43,6 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.jupiter.api.Assertions.*;
 
-//import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * A test class demonstrating the various ways to do the same kinds of assertions between popular assertion libraries.
  *
