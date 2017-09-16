@@ -20,12 +20,12 @@ package com.github.jrh3k5.java.assertions;
  * #L%
  */
 
-
 import com.github.jrh3k5.java.assertions.assertions.CharacterSpecies;
 import com.github.jrh3k5.java.assertions.assertions.TolkienCharacter;
-import static com.github.jrh3k5.java.assertions.assertions.CharacterSpecies.*;
-
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.IterableAssert;
+import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -35,10 +35,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.github.jrh3k5.java.assertions.assertions.CharacterSpecies.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.junit.jupiter.api.Assertions.*;
+
+//import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A test class demonstrating the various ways to do the same kinds of assertions between popular assertion libraries.
@@ -71,6 +76,75 @@ class AssertionComparisonsTest {
         //fellowship.remove(BOROMIR);
         // Uncomment this for an unexpected Theodred to join the Fellowship
         //fellowship.add(THEODRED);
+    }
+
+    /**
+     * Exercise assertions using traditional JUnit assertions
+     */
+    @Nested
+    @DisplayName("when using Hamcrest assertions")
+    class HamcrestAssertions {
+        @Test
+        @DisplayName("has no servants of the Ring")
+        void hasNoServantsOfTheRing() {
+            assertThat(fellowship, not(hasItems(SARUMAN, GOLLUM)));
+        }
+
+        @Test
+        @DisplayName("still has Boromir")
+        void stillHasBoromir() {
+            assertThat(fellowship, hasItem(BOROMIR));
+        }
+
+        @Test
+        @DisplayName("has no one named Theodred")
+        void hasNoOneNamedTheodred() {
+            final List<String> names = fellowship.stream()
+                    .map(TolkienCharacter::getName)
+                    .collect(Collectors.toList());
+            assertThat(names, not(hasItem(THEODRED.getName())));
+        }
+
+        @Test
+        @DisplayName("executes the same assertions for multiple objects")
+        void executesSameAssertions() {
+            final Consumer<TolkienCharacter> assertion = (c) -> assertThat(c.getSpecies(), is(HOBBIT));
+
+            assertion.accept(FRODO);
+            assertion.accept(SAM);
+            assertion.accept(MERRY);
+            assertion.accept(PIPPIN);
+            // Uncomment this to see the error message
+            //assertion.accept(THEODRED);
+        }
+
+        @Test
+        @DisplayName("test for size of potentially-null Collection")
+        // Un-ignore to see the error message in action
+        @Disabled
+        void testsMaybeNullCollectionSize() {
+            assertThat(couldReturnNull(), hasSize(1));
+        }
+
+        @Test
+        @DisplayName("none of the Fellowship Hobbits should be Gollum")
+        void noFellowshipHobbitsAreGollum() {
+            final List<TolkienCharacter> hobbits = fellowship.stream()
+                    .filter(c -> HOBBIT.equals(c.getSpecies()))
+                    .collect(Collectors.toList());
+            assertThat(hobbits, hasItems(FRODO, SAM, MERRY, PIPPIN));
+            assertThat(hobbits, not(hasItems(GOLLUM)));
+        }
+
+        /**
+         * A proxy method to allow the use of multiple classes defining an assertThat() method.
+         * @param actual The object against which an assertion is to be ran.
+         * @param matcher The {@link Matcher} to be ran against the given object.
+         * @param <T> The type of object to be validated.
+         */
+        private <T> void assertThat(T actual, Matcher<? super T> matcher) {
+            MatcherAssert.assertThat(actual, matcher);
+        }
     }
 
     /**
@@ -189,6 +263,26 @@ class AssertionComparisonsTest {
                                   .hasSize(4)
                                   .contains(FRODO, SAM, MERRY, PIPPIN)
                                   .doesNotContain(GOLLUM);
+        }
+
+        /**
+         * A proxy method to allow for multiple classes declaring an assertThat() method to be used in this test class.
+         * @param collection The {@link Collection} against which assertions are to be ran.
+         * @param <T> The type of objects in the collection.
+         * @return An {@link IterableAssert} used to run assertions on the given collection.
+         */
+        private <T> IterableAssert<T> assertThat(Collection<T> collection) {
+            return org.assertj.core.api.Assertions.assertThat(collection);
+        }
+
+        /**
+         * A proxy method to allow for multiple classes declaring an assertThat() method to be used in this test class.
+         * @param object The object against which the assertions are to occur.
+         * @param <T> The type of object against which assertions are to be ran.
+         * @return An {@link AbstractObjectAssert} used to run assertions against the given object.
+         */
+        private <T> AbstractObjectAssert<?, T> assertThat(T object) {
+            return org.assertj.core.api.Assertions.assertThat(object);
         }
     }
 

@@ -21,10 +21,7 @@ package com.github.jrh3k5.java.assertions.assertions;
  */
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * A simple bean representing a Tolkien character.
@@ -36,8 +33,8 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class TolkienCharacter {
-    @Getter
+    @Getter @NonNull
     private final String name;
-    @Getter
+    @Getter @NonNull
     private CharacterSpecies species;
 }
