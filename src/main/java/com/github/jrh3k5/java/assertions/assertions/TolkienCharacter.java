@@ -36,5 +36,5 @@ public class TolkienCharacter {
     @Getter @NonNull
     private final String name;
     @Getter @NonNull
-    private CharacterSpecies species;
+    private final CharacterSpecies species;
 }
