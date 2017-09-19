@@ -22,6 +22,9 @@ package com.github.jrh3k5.java.assertions;
 
 import com.github.jrh3k5.java.assertions.assertions.CharacterSpecies;
 import com.github.jrh3k5.java.assertions.assertions.TolkienCharacter;
+import com.google.common.truth.DefaultSubject;
+import com.google.common.truth.IterableSubject;
+import com.google.common.truth.Subject;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.IterableAssert;
 import org.hamcrest.Matcher;
@@ -230,7 +233,7 @@ class AssertionComparisonsTest {
         @DisplayName("has no one named Theodred")
         void hasNoOneNamedTheodred() {
             assertThat(fellowship).extracting("name")
-                                  .doesNotContain(THEODRED.getName());
+                    .doesNotContain(THEODRED.getName());
         }
 
         @Test
@@ -258,9 +261,9 @@ class AssertionComparisonsTest {
         @DisplayName("none of the Fellowship Hobbits should be Gollum")
         void noFellowshipHobbitsAreGollum() {
             assertThat(fellowship).filteredOn("species", HOBBIT)
-                                  .hasSize(4)
-                                  .contains(FRODO, SAM, MERRY, PIPPIN)
-                                  .doesNotContain(GOLLUM);
+                    .hasSize(4)
+                    .contains(FRODO, SAM, MERRY, PIPPIN)
+                    .doesNotContain(GOLLUM);
         }
 
         /**
@@ -281,6 +284,84 @@ class AssertionComparisonsTest {
          */
         private <T> AbstractObjectAssert<?, T> assertThat(T object) {
             return org.assertj.core.api.Assertions.assertThat(object);
+        }
+    }
+
+    /**
+     * Exercise assertions using traditional Google Truth assertions
+     */
+    @Nested
+    @DisplayName("when using Google Truth assertions")
+    class GoogleTruthAssertions {
+        @Test
+        @DisplayName("has no servants of the Ring")
+        void hasNoServantsOfTheRing() {
+            assertThat(fellowship).containsNoneOf(GOLLUM, SARUMAN);
+        }
+
+        @Test
+        @DisplayName("still has Boromir")
+        void stillHasBoromir() {
+            assertThat(fellowship).contains(BOROMIR);
+        }
+
+        @Test
+        @DisplayName("has no one named Theodred")
+        void hasNoOneNamedTheodred() {
+            final List<String> names = fellowship.stream()
+                                                 .map(TolkienCharacter::getName)
+                                                 .collect(Collectors.toList());
+            assertThat(names).doesNotContain(THEODRED.getName());
+        }
+
+        @Test
+        @DisplayName("executes the same assertions for multiple objects")
+        void executesSameAssertions() {
+            final Consumer<TolkienCharacter> assertion = (c) -> assertThat(c.getSpecies()).isEqualTo(CharacterSpecies.HOBBIT);
+
+            assertion.accept(FRODO);
+            assertion.accept(SAM);
+            assertion.accept(MERRY);
+            assertion.accept(PIPPIN);
+            // Uncomment this to see the error message
+            //assertion.accept(THEODRED);
+        }
+
+        @Test
+        @DisplayName("test for size of potentially-null Collection")
+        // Un-ignore to see the error message in action
+        @Disabled
+        void testsMaybeNullCollectionSize() {
+            assertThat(couldReturnNull()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("none of the Fellowship Hobbits should be Gollum")
+        void noFellowshipHobbitsAreGollum() {
+            final List<TolkienCharacter> hobbits = fellowship.stream()
+                                                             .filter(c -> HOBBIT.equals(c.getSpecies()))
+                                                             .collect(Collectors.toList());
+            assertThat(hobbits).hasSize(4);
+            assertThat(hobbits).containsAllOf(FRODO, SAM, MERRY, PIPPIN);
+            assertThat(hobbits).doesNotContain(GOLLUM);
+        }
+
+        /**
+         * A proxy method to allow for multiple classes declaring an assertThat() method to be used in this test class.
+         * @param collection The {@link Collection} against which assertions are to be ran.
+         * @return An {@link IterableSubject} used to run assertions on the given collection.
+         */
+        private IterableSubject assertThat(Collection<?> collection) {
+            return com.google.common.truth.Truth.assertThat(collection);
+        }
+
+        /**
+         * A proxy method to allow for multiple classes declaring an assertThat() method to be used in this test class.
+         * @param object The object against which the assertions are to occur.
+         * @return A {@link Subject} used to run assertions against the given object.
+         */
+        private Subject<DefaultSubject, Object> assertThat(Object object) {
+            return com.google.common.truth.Truth.assertThat(object);
         }
     }
 
