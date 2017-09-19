@@ -21,3 +21,12 @@ The following statistics exist for declaration of dependencies on each assertion
 * **Hamcrest**: using the _hamcrest-core_ library as the determination of yields, at time of writing this, [33,380](https://github.com/search?l=Maven+POM&q="hamcrest-core"+filename%3Apom.xml&type=Code&utf8=✓) results for POMs and [5,393](https://github.com/search?l=Gradle&q="hamcrest-core"+filename%3Abuild.gradle&type=Code&utf8=✓) for Gradle, for a total of 38,773. This may be a small estimation, however, as some projects, such as _mockito-all_ bundle Hamcrest classes in with their assemblies, so there may be false negatives in projects that use libraries like _mockito-all_ to bring in their own functionality as well as Hamcrest functionality.
 * **Google Truth**: using the _com.google.truth_ group ID (since the artifact ID of "truth" is likely to result in a non-negligible amount of false positives) yields, at time of writing this, [2,535](https://github.com/search?l=Maven+POM&q="com.google.truth"+filename%3Apom.xml&type=Code&utf8=✓) results for POMs and [1,437](https://github.com/search?l=Gradle&q="com.google.truth"+filename%3Abuild.gradle&type=Code&utf8=✓) results for Gradle, for a total of 3,972.
 * **assertj**: using the _assertj-core_ library as the determination of yields, at time of writing this, [30,277](https://github.com/search?l=Maven+POM&q="assertj-core"+filename%3Apom.xml&type=Code&utf8=✓) results for POMs and [9,090](https://github.com/search?l=Gradle&q="assertj-core"+filename%3Abuild.gradle&type=Code&utf8=✓) results for Gradle, for a total of 39,367.
+
+### Java Code Dependencies
+
+The following statistics exist for usage of these assertion libraries in Java code, searching by import statements.
+
+* **JUnit Assert**: searching for imports of _org.junit.Assert_ yields [3,176,406](https://github.com/search?utf8=✓&q="org.junit.Assert"+language%3AJava&type=Code) results
+* **Hamcrest**: searching for imports of _org.hamcrest.Matchers_ yields [396,818](https://github.com/search?utf8=✓&q="org.hamcrest.Matchers"+language%3AJava&type=Code) results
+* **Google Truth**: searching for imports of _com.google.common.truth_ yields [57,340](https://github.com/search?utf8=✓&q="com.google.common.truth"+language%3AJava&type=Code) results
+* **assertj**: searching for imports of _org.assertj.core.api_ yields [303,846](https://github.com/search?utf8=✓&q="org.assertj.core.api.Assertions"+language%3AJava&type=Code) results
